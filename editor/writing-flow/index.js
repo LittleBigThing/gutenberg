@@ -54,7 +54,6 @@ class WritingFlow extends Component {
 	}
 
 	getEditables( target ) {
-		console.log( 'getEditables' );
 		const outer = closest( target, '.editor-visual-editor__block-edit' );
 		if ( ! outer ) {
 			return [ target ];
@@ -70,16 +69,13 @@ class WritingFlow extends Component {
 
 	isLastEditable( target ) {
 		const editables = this.getEditables( target );
-		
 		const index = editables.indexOf( target );
-		console.log('last check', editables, index);
 		return editables.length > 0 && index === editables.length - 1;
 	}
 
 	isFirstEditable( target ) {
 		const editables = this.getEditables( target );
 		const index = editables.indexOf( target );
-		console.log('first check', editables, index);
 		return editables.length > 0 && index === 0;
 	}
 
@@ -119,7 +115,8 @@ class WritingFlow extends Component {
 		} );
 	}
 
-	expandSelection( blocks, currentStartUid, currentEndUid, delta ) {
+	expandSelection( blocks, currentStartUid, currentEndUid, moveUp ) {
+		const delta = moveUp ? -1 : +1;
 		const lastIndex = blocks.indexOf( currentEndUid );
 		const nextIndex = Math.max( 0, Math.min( blocks.length - 1, lastIndex + delta ) );
 		this.props.onMultiSelect( currentStartUid, blocks[ nextIndex ] );
@@ -134,7 +131,6 @@ class WritingFlow extends Component {
 	}
 
 	onKeyDown( event ) {
-		console.log( 'event', event );
 		const { multiSelectedBlocks, selectedBlock, selectionStart, selectionEnd, blocks } = this.props;
 
 		const { keyCode, target } = event;
@@ -156,10 +152,10 @@ class WritingFlow extends Component {
 			// Shift key is down and existing block selection
 			event.preventDefault();
 			this.expandSelection( blocks, selectionStart, selectionEnd, isReverse ? -1 : +1 );
-		} else if ( isVertical && isShift && this.isEditableEdge( isReverse, target ) && isEdge( target, isReverse ) ) {
+		} else if ( isVertical && isShift && this.isEditableEdge( isReverse, target ) && isEdge( target, isReverse, true ) ) {
 			// Shift key is down, but no existing block selection
 			event.preventDefault();
-			this.expandSelection( blocks, selectedBlock.uid, selectedBlock.uid, moveUp ? -1 : +1 );
+			this.expandSelection( blocks, selectedBlock.uid, selectedBlock.uid, isReverse ? -1 : +1 );
 		} else if ( isVertical && isVerticalEdge( target, isReverse ) ) {
 			const closestTabbable = this.getClosestTabbable( target, isReverse );
 			placeCaretAtVerticalEdge( closestTabbable, isReverse, this.verticalRect );

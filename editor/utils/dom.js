@@ -16,9 +16,8 @@ const { TEXT_NODE } = window.Node;
  * @param  {Boolean} isReverse Set to true to check left, false for right.
  * @return {Boolean}           True if at the edge, false if not.
  */
-export function isHorizontalEdge( container, isReverse, collapseRanges = true ) {
+export function isHorizontalEdge( container, isReverse, collapseRanges = false ) {
 	if ( includes( [ 'INPUT', 'TEXTAREA' ], container.tagName ) ) {
-
 		if ( container.selectionStart !== container.selectionEnd ) {
 			return false;
 		}
