@@ -25,7 +25,6 @@ import {
 	getMultiSelectedBlocksStartUid,
 	getMultiSelectedBlocksEndUid,
 	getMultiSelectedBlocks,
-	getMultiSelectedBlockUids,
 	getSelectedBlock,
 } from '../selectors';
 
@@ -130,7 +129,7 @@ class WritingFlow extends Component {
 	}
 
 	onKeyDown( event ) {
-		const { multiSelectedBlocks, selectedBlock, selectionStart, selectionEnd, blocks } = this.props;
+		const { selectedBlock, selectionStart, selectionEnd, blocks, hasMultiSelection } = this.props;
 
 		const { keyCode, target } = event;
 		const isUp = keyCode === UP;
@@ -142,8 +141,6 @@ class WritingFlow extends Component {
 		const isVertical = isUp || isDown;
 
 		const isShift = event.shiftKey;
-		const hasMultiSelection = multiSelectedBlocks.length > 1;
-
 		if ( isVertical && isShift && hasMultiSelection ) {
 			// Shift key is down and existing block selection
 			event.preventDefault();
@@ -182,8 +179,7 @@ export default connect(
 		blocks: getBlockUids( state ),
 		selectionStart: getMultiSelectedBlocksStartUid( state ),
 		selectionEnd: getMultiSelectedBlocksEndUid( state ),
-		multiSelectedBlocks: getMultiSelectedBlocks( state ),
-		multiSelectedBlockUids: getMultiSelectedBlockUids( state ),
+		hasMultiSelection: getMultiSelectedBlocks( state ).length > 1,
 		selectedBlock: getSelectedBlock( state ),
 	} ),
 	( dispatch ) => ( {
