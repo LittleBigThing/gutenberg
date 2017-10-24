@@ -95,8 +95,7 @@ class WritingFlow extends Component {
 		} );
 	}
 
-	expandSelection( blocks, currentStartUid, currentEndUid, moveUp ) {
-		const delta = moveUp ? -1 : +1;
+	expandSelection( blocks, currentStartUid, currentEndUid, delta ) {
 		const lastIndex = blocks.indexOf( currentEndUid );
 		const nextIndex = Math.max( 0, Math.min( blocks.length - 1, lastIndex + delta ) );
 		this.props.onMultiSelect( currentStartUid, blocks[ nextIndex ] );
@@ -120,8 +119,14 @@ class WritingFlow extends Component {
 		const isReverse = isUp || isLeft;
 		const isHorizontal = isLeft || isRight;
 		const isVertical = isUp || isDown;
-
 		const isShift = event.shiftKey;
+
+		if ( ! isVertical ) {
+			this.verticalRect = null;
+		} else if ( ! this.verticalRect ) {
+			this.verticalRect = computeCaretRect( target );
+		}
+
 		if ( isVertical && isShift && hasMultiSelection ) {
 			// Shift key is down and existing block selection
 			event.preventDefault();
@@ -130,11 +135,11 @@ class WritingFlow extends Component {
 			// Shift key is down, but no existing block selection
 			event.preventDefault();
 			this.expandSelection( blocks, selectedBlock.uid, selectedBlock.uid, isReverse ? -1 : +1 );
-		} else if ( isVertical && isVerticalEdge( target, isReverse ) ) {
+		} else if ( isVertical && isVerticalEdge( target, isReverse, isShift ) ) {
 			const closestTabbable = this.getClosestTabbable( target, isReverse );
 			placeCaretAtVerticalEdge( closestTabbable, isReverse, this.verticalRect );
 			event.preventDefault();
-		} else if ( isHorizontal && isHorizontalEdge( target, isReverse ) ) {
+		} else if ( isHorizontal && isHorizontalEdge( target, isReverse, isShift ) ) {
 			const closestTabbable = this.getClosestTabbable( target, isReverse );
 			placeCaretAtHorizontalEdge( closestTabbable, isReverse );
 			event.preventDefault();

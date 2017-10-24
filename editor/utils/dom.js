@@ -79,7 +79,7 @@ export function isHorizontalEdge( container, isReverse, collapseRanges = false )
  * @param  {Boolean} isReverse Set to true to check top, false for bottom.
  * @return {Boolean}           True if at the edge, false if not.
  */
-export function isVerticalEdge( container, isReverse ) {
+export function isVerticalEdge( container, isReverse, collapseRanges = false ) {
 	if ( includes( [ 'INPUT', 'TEXTAREA' ], container.tagName ) ) {
 		return isHorizontalEdge( container, isReverse );
 	}
@@ -89,7 +89,11 @@ export function isVerticalEdge( container, isReverse ) {
 	}
 
 	const selection = window.getSelection();
-	const range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
+	let range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
+	if ( collapseRanges ) {
+		range = range.cloneRange();
+		range.collapse( isReverse );
+	}
 
 	if ( ! range || ! range.collapsed ) {
 		return false;
