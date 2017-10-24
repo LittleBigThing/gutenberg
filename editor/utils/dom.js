@@ -15,7 +15,7 @@ const { TEXT_NODE } = window.Node;
  * @param  {Element} container       Focusable element.
  * @param  {Boolean} isReverse       Set to true to check left, false for right.
  * @param  {Boolean} collapseRanges  Whether or not to collapse the selection range before the check
- * @return {Boolean}
+ * @return {Boolean}                 True if at the horizontal edge, false if not.
  */
 export function isHorizontalEdge( container, isReverse, collapseRanges = false ) {
 	if ( includes( [ 'INPUT', 'TEXTAREA' ], container.tagName ) ) {
@@ -73,26 +73,7 @@ export function isHorizontalEdge( container, isReverse, collapseRanges = false )
 }
 
 /**
- * Check whether there is a node above node (or node itself) that matches selector
- *
- * @param  {Element} node DOM Element
- * @param  {Boolean} selector  The selector to match
- * @return {Element}           A node if one is found matching the selector, otherwise null
- */
-export function closest( node, selector ) {
-	if ( node.matches( selector ) ) {
-		return node;
-	}
-
-	if ( node.parentNode ) {
-		return closest( node.parentNode, selector );
-	}
-
-	return null;
-}
-
-/**
- * Check whether the caret is vertically at the edge of the container.
+ * Places the caret at start or end of a given element
  *
  * @param  {Element} container Focusable element.
  * @param  {Boolean} isReverse Set to true to check top, false for bottom.

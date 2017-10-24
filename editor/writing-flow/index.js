@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
+import 'element-closest';
 
 /**
  * WordPress dependencies
@@ -12,14 +13,12 @@ import { find, reverse } from 'lodash';
 /**
  * Internal dependencies
  */
-
 import { 
 	isHorizontalEdge,
 	isVerticalEdge,
 	computeCaretRect,
 	placeCaretAtHorizontalEdge,
-	placeCaretAtVerticalEdge,
-	closest
+	placeCaretAtVerticalEdge
 } from '../utils/dom';
 import {
 	getBlockUids,
@@ -54,7 +53,7 @@ class WritingFlow extends Component {
 	}
 
 	getEditables( target ) {
-		const outer = closest( target, '.editor-visual-editor__block-edit' );
+		const outer = target.closest( '.editor-visual-editor__block-edit' );
 		if ( ! outer ) {
 			return [ target ];
 		}
@@ -141,9 +140,6 @@ class WritingFlow extends Component {
 		const isReverse = isUp || isLeft;
 		const isHorizontal = isLeft || isRight;
 		const isVertical = isUp || isDown;
-
-		const isShift = event.shiftKey;
-		const hasMultiSelection = multiSelectedBlocks.length > 1;
 
 		const isShift = event.shiftKey;
 		const hasMultiSelection = multiSelectedBlocks.length > 1;

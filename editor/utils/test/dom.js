@@ -91,27 +91,4 @@ describe( 'DOM', () => {
 			expect( isHorizontalEdge( input, false ) ).toBe( true );
 		} );
 	} );
-
-	describe( 'closest', () => {
-		it( 'closest can return itself', () => {
-			const input = document.createElement( 'input' );
-			const output = closest( input, 'input' );
-			expect( output ).toBe( input );
-		} );
-
-		it( 'closest can return its parent', () => {
-			const child = document.createElement( 'span' );
-			const ancestor = document.createElement( 'div' );
-			ancestor.appendChild( child );
-			expect( closest( child, 'div' ) ).toBe( ancestor );
-			expect( closest( child, 'pre' ) ).toBe( null );
-		} );
-
-		it( 'closest should not return its child', () => {
-			const child = document.createElement( 'span' );
-			const ancestor = document.createElement( 'div' );
-			ancestor.appendChild( child );
-			expect( closest( ancestor, 'span' ) ).toBe( null );
-		} );
-	} );
 } );
