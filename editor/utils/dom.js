@@ -35,9 +35,9 @@ export function isHorizontalEdge( container, isReverse, collapseRanges = false )
 	}
 
 	const selection = window.getSelection();
-	const liveRange = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
-	const range = liveRange.cloneRange();
+	let range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
 	if ( collapseRanges ) {
+		range = range.cloneRange();
 		range.collapse( isReverse );
 	}
 
