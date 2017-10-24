@@ -75,9 +75,10 @@ export function isHorizontalEdge( container, isReverse, collapseRanges = false )
 /**
  * Check whether the caret is vertically at the edge of the container.
  *
- * @param  {Element} container Focusable element.
- * @param  {Boolean} isReverse Set to true to check top, false for bottom.
- * @return {Boolean}           True if at the edge, false if not.
+ * @param  {Element} container       Focusable element.
+ * @param  {Boolean} isReverse       Set to true to check top, false for bottom.
+ * @param  {Boolean} collapseRanges  Whether or not to collapse the selection range before the check
+ * @return {Boolean}                 True if at the edge, false if not.
  */
 export function isVerticalEdge( container, isReverse, collapseRanges = false ) {
 	if ( includes( [ 'INPUT', 'TEXTAREA' ], container.tagName ) ) {

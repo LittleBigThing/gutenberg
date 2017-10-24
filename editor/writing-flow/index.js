@@ -13,12 +13,12 @@ import { find, reverse } from 'lodash';
 /**
  * Internal dependencies
  */
-import { 
+import {
 	isHorizontalEdge,
 	isVerticalEdge,
 	computeCaretRect,
 	placeCaretAtHorizontalEdge,
-	placeCaretAtVerticalEdge
+	placeCaretAtVerticalEdge,
 } from '../utils/dom';
 import {
 	getBlockUids,
@@ -29,7 +29,6 @@ import {
 } from '../selectors';
 
 import { multiSelect } from '../actions';
-
 
 /**
  * Module Constants
