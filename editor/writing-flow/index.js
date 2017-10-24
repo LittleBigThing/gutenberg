@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { connect } from 'react-redux';
+
+/**
  * WordPress dependencies
  */
 import { Component } from 'element';
@@ -7,13 +12,26 @@ import { find, reverse } from 'lodash';
 /**
  * Internal dependencies
  */
-import {
+
+import { 
 	isHorizontalEdge,
 	isVerticalEdge,
 	computeCaretRect,
 	placeCaretAtHorizontalEdge,
 	placeCaretAtVerticalEdge,
+	closest
 } from '../utils/dom';
+import {
+	getBlockUids,
+	getMultiSelectedBlocksStartUid,
+	getMultiSelectedBlocksEndUid,
+	getMultiSelectedBlocks,
+	getMultiSelectedBlockUids,
+	getSelectedBlock,
+} from '../selectors';
+
+import { multiSelect } from '../actions';
+
 
 /**
  * Module Constants
@@ -26,12 +44,43 @@ class WritingFlow extends Component {
 
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.bindContainer = this.bindContainer.bind( this );
-
 		this.verticalRect = null;
+		this.isLastEditable = this.isLastEditable.bind( this );
+		this.isFirstEditable = this.isFirstEditable.bind( this );
 	}
 
 	bindContainer( ref ) {
 		this.container = ref;
+	}
+
+	getEditables( target ) {
+		console.log( 'getEditables' );
+		const outer = closest( target, '.editor-visual-editor__block-edit' );
+		if ( ! outer ) {
+			return [ target ];
+		}
+
+		if ( target === outer ) {
+			return [ target ];
+		}
+
+		const elements = outer.querySelectorAll( '[contenteditable="true"]' );
+		return [ ...elements ];
+	}
+
+	isLastEditable( target ) {
+		const editables = this.getEditables( target );
+		
+		const index = editables.indexOf( target );
+		console.log('last check', editables, index);
+		return editables.length > 0 && index === editables.length - 1;
+	}
+
+	isFirstEditable( target ) {
+		const editables = this.getEditables( target );
+		const index = editables.indexOf( target );
+		console.log('first check', editables, index);
+		return editables.length > 0 && index === 0;
 	}
 
 	getVisibleTabbables() {
@@ -70,7 +119,24 @@ class WritingFlow extends Component {
 		} );
 	}
 
+	expandSelection( blocks, currentStartUid, currentEndUid, delta ) {
+		const lastIndex = blocks.indexOf( currentEndUid );
+		const nextIndex = Math.max( 0, Math.min( blocks.length - 1, lastIndex + delta ) );
+		this.props.onMultiSelect( currentStartUid, blocks[ nextIndex ] );
+	}
+
+	isEditableEdge( moveUp, target ) {
+		if ( moveUp ) {
+			return this.isFirstEditable( target );
+		}
+
+		return this.isLastEditable( target );
+	}
+
 	onKeyDown( event ) {
+		console.log( 'event', event );
+		const { multiSelectedBlocks, selectedBlock, selectionStart, selectionEnd, blocks } = this.props;
+
 		const { keyCode, target } = event;
 		const isUp = keyCode === UP;
 		const isDown = keyCode === DOWN;
@@ -80,20 +146,27 @@ class WritingFlow extends Component {
 		const isHorizontal = isLeft || isRight;
 		const isVertical = isUp || isDown;
 
-		if ( ! isVertical ) {
-			this.verticalRect = null;
-		} else if ( ! this.verticalRect ) {
-			this.verticalRect = computeCaretRect( target );
-		}
+		const isShift = event.shiftKey;
+		const hasMultiSelection = multiSelectedBlocks.length > 1;
 
-		if ( isVertical && isVerticalEdge( target, isReverse ) ) {
+		const isShift = event.shiftKey;
+		const hasMultiSelection = multiSelectedBlocks.length > 1;
+
+		if ( isVertical && isShift && hasMultiSelection ) {
+			// Shift key is down and existing block selection
+			event.preventDefault();
+			this.expandSelection( blocks, selectionStart, selectionEnd, isReverse ? -1 : +1 );
+		} else if ( isVertical && isShift && this.isEditableEdge( isReverse, target ) && isEdge( target, isReverse ) ) {
+			// Shift key is down, but no existing block selection
+			event.preventDefault();
+			this.expandSelection( blocks, selectedBlock.uid, selectedBlock.uid, moveUp ? -1 : +1 );
+		} else if ( isVertical && isVerticalEdge( target, isReverse ) ) {
 			const closestTabbable = this.getClosestTabbable( target, isReverse );
 			placeCaretAtVerticalEdge( closestTabbable, isReverse, this.verticalRect );
 			event.preventDefault();
 		} else if ( isHorizontal && isHorizontalEdge( target, isReverse ) ) {
 			const closestTabbable = this.getClosestTabbable( target, isReverse );
 			placeCaretAtHorizontalEdge( closestTabbable, isReverse );
-			event.preventDefault();
 		}
 	}
 
@@ -112,4 +185,18 @@ class WritingFlow extends Component {
 	}
 }
 
-export default WritingFlow;
+export default connect(
+	( state, ownProps ) => ( {
+		blocks: getBlockUids( state ),
+		selectionStart: getMultiSelectedBlocksStartUid( state ),
+		selectionEnd: getMultiSelectedBlocksEndUid( state ),
+		multiSelectedBlocks: getMultiSelectedBlocks( state ),
+		multiSelectedBlockUids: getMultiSelectedBlockUids( state ),
+		selectedBlock: getSelectedBlock( state ),
+	} ),
+	( dispatch, ownProps ) => ( {
+		onMultiSelect( start, end ) {
+			dispatch( multiSelect( start, end ) );
+		},
+	} )
+)( WritingFlow );

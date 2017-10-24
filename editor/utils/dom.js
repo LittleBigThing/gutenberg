@@ -16,8 +16,9 @@ const { TEXT_NODE } = window.Node;
  * @param  {Boolean} isReverse Set to true to check left, false for right.
  * @return {Boolean}           True if at the edge, false if not.
  */
-export function isHorizontalEdge( container, isReverse ) {
+export function isHorizontalEdge( container, isReverse, collapseRanges = true ) {
 	if ( includes( [ 'INPUT', 'TEXTAREA' ], container.tagName ) ) {
+
 		if ( container.selectionStart !== container.selectionEnd ) {
 			return false;
 		}
@@ -34,7 +35,11 @@ export function isHorizontalEdge( container, isReverse ) {
 	}
 
 	const selection = window.getSelection();
-	const range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
+	const liveRange = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
+	const range = liveRange.cloneRange();
+	if ( collapseRanges ) {
+		range.collapse( isReverse );
+	}
 
 	if ( ! range || ! range.collapsed ) {
 		return false;
@@ -65,6 +70,18 @@ export function isHorizontalEdge( container, isReverse ) {
 	}
 
 	return true;
+}
+
+export function closest( node, selector ) {
+	if ( node.matches( selector ) ) {
+		return node;
+	}
+
+	if ( node.parentNode ) {
+		return closest( node.parentNode, selector );
+	}
+
+	return null;
 }
 
 /**
