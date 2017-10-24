@@ -73,7 +73,7 @@ export function isHorizontalEdge( container, isReverse, collapseRanges = false )
 }
 
 /**
- * Places the caret at start or end of a given element
+ * Check whether the caret is vertically at the edge of the container.
  *
  * @param  {Element} container Focusable element.
  * @param  {Boolean} isReverse Set to true to check top, false for bottom.

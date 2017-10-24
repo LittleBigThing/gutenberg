@@ -126,7 +126,7 @@ class WritingFlow extends Component {
 			// Shift key is down and existing block selection
 			event.preventDefault();
 			this.expandSelection( blocks, selectionStart, selectionEnd, isReverse ? -1 : +1 );
-		} else if ( isVertical && isShift && this.isEditableEdge( isReverse, target ) && isEdge( target, isReverse, true ) ) {
+		} else if ( isVertical && isShift && this.isEditableEdge( isReverse, target ) && isVerticalEdge( target, isReverse, true ) ) {
 			// Shift key is down, but no existing block selection
 			event.preventDefault();
 			this.expandSelection( blocks, selectedBlock.uid, selectedBlock.uid, isReverse ? -1 : +1 );
@@ -137,6 +137,7 @@ class WritingFlow extends Component {
 		} else if ( isHorizontal && isHorizontalEdge( target, isReverse ) ) {
 			const closestTabbable = this.getClosestTabbable( target, isReverse );
 			placeCaretAtHorizontalEdge( closestTabbable, isReverse );
+			event.preventDefault();
 		}
 	}
 
