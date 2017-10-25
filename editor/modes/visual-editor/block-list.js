@@ -2,7 +2,10 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import { throttle, mapValues, noop, invert } from 'lodash';
+import { throttle, mapValues, noop, invert, isEqual } from 'lodash';
+import scrollIntoView from 'dom-scroll-into-view';
+import 'element-closest';
+
 
 /**
  * WordPress dependencies
@@ -59,6 +62,19 @@ class VisualEditorBlockList extends Component {
 		document.removeEventListener( 'copy', this.onCopy );
 		document.removeEventListener( 'cut', this.onCut );
 		window.removeEventListener( 'mousemove', this.setLastClientY );
+	}
+
+	componentWillReceiveProps( nextProps ) {
+		if ( isEqual( this.props.multiSelectedBlockUids, nextProps.multiSelectedBlockUids ) ) {
+			return;
+		}
+
+		if ( nextProps.multiSelectedBlockUids && nextProps.multiSelectedBlockUids.length > 0 ) {
+			const last = this.refs[ nextProps.multiSelectedBlockUids[ nextProps.multiSelectedBlockUids.length - 1 ] ];
+			scrollIntoView( last, last.closest( '.editor-layout__editor' ), {
+				onlyScrollIfNeeded: true,
+			} );
+		}
 	}
 
 	setLastClientY( { clientY } ) {
