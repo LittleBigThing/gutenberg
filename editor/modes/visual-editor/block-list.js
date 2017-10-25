@@ -70,8 +70,8 @@ class VisualEditorBlockList extends Component {
 		}
 
 		if ( nextProps.multiSelectedBlockUids && nextProps.multiSelectedBlockUids.length > 0 ) {
-			const last = this.refs[ nextProps.multiSelectedBlockUids[ nextProps.multiSelectedBlockUids.length - 1 ] ];
-			scrollIntoView( last, last.closest( '.editor-layout__editor' ), {
+			const extent = this.refs[ nextProps.selectionEnd ];
+			scrollIntoView( extent, extent.closest( '.editor-layout__editor' ), {
 				onlyScrollIfNeeded: true,
 			} );
 		}
